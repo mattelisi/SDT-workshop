@@ -1,0 +1,1054 @@
+---
+title: "Signal Detection Theory"
+subtitle: "<br>_CDS Summer School_<br>"
+author: "Matteo Lisi"
+format:
+  revealjs:
+    logo: img/logo-small-london-cmyk.jpg
+    footer: "CDS Summer School, 8th September 2025"
+    incremental: true  
+    auto-stretch: false
+    code-fold: false   # don’t fold
+    code-line-numbers: false
+    echo: true         # show code by default
+    theme: [default, matteo_rhul.css]
+editor: visual
+keep-md: true
+filters: [bg_style.lua]
+---
+
+## Outline
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggdag)
+library(dagitty)
+
+par(cex = 1.15) 
+```
+
+::: nonincremental
+1.  What is *Signal Detection Theory*?
+
+2.  Equal-variance Gaussian model
+
+3.  Equal-variance SDT as generalised linear model (GLM)
+
+4.  Unequal-variance SDT
+:::
+
+# (1) Signal Detection Theory
+
+## Signal Detection Theory (SDT)
+
+:::::: columns
+:::: {.column width="70%"}
+::: nonincremental
+-   *"A framework of statistical methods used to model how observers classify sensory events"*\
+    (Knoblauch & Maloney, 2012)
+
+-   Developed in the 1950s in studies of perception
+
+-   Can be applied to any task involving detection of a *"signal"* in *"noise"*
+
+-   Allows explaining behaviour in terms of **bias** and **sensitivity**
+:::
+::::
+
+::: {.column width="30%"}
+   
+
+![Green & Swets, 1966](img/SDT_green_book.png){fig-align="center" width="90%"}
+:::
+::::::
+
+## Signal detection theory (SDT) {.nonincremental}
+
+ 
+
+4 possible outcomes when trying to detect a signal in noise
+
+:::::::::::: columns
+::: {.column width="55%"}
+   
+
++------------+------------+------------------------+
+|            |            | *Stimulus space*       |
++------------+------------+------------------------+
+|            | **Signal** | **Not signal**         |
++------------+------------+------------------------+
+| *Decision\ | **Yes**    | Hit (H)                |
+| space*     |            |                        |
++------------+------------+------------------------+
+| **No**     | Miss (M)   | Correct rejection (CR) |
++------------+------------+------------------------+
+:::
+
+::: {.column width="5%"}
+:::
+
+::::::::: {.column width="40%"}
+ 
+
+::::: fragment
+["Desirable" outcomes:]{style="color:#198754"}
+
+:::: nonincremental
+::: {style="font-size: 70%;"}
+-   [[**Hit**]{.underline} **(H):** Correctly detect signal]{style="color:#198754"}
+-   [[**Correct rejection**]{.underline} **(CR):** Correctly say no signal]{style="color:#198754"}
+:::
+::::
+:::::
+
+::::: fragment
+ 
+
+[Errors:]{style="color:#dc3545"}
+
+:::: nonincremental
+::: {style="font-size: 70%;"}
+-   [[**Miss**]{.underline} **(M):** Fail to detect signal]{style="color:#dc3545"}
+-   [[**False alarm**]{.underline} **(FA):** Mistakenly detect signal]{style="color:#dc3545"}
+:::
+::::
+:::::
+:::::::::
+::::::::::::
+
+ 
+
+-   When information is incomplete/ambiguous, we make mistakes (M or FA).
+-   SDT can provide *optimal* decision rules, even with unequal priors/payoffs.
+
+## Simulating a signal detection experiment in R
+
+ 
+
+We need 2 parameters; e.g. $p(\text{H})$ and $p(\text{FA})$
+
+```{r, echo=FALSE}
+set.seed(1)
+```
+
+```{r}
+N <- 150
+pH <- 0.9
+pFA <- 0.1
+H <- rbinom(1, N, pH)
+M <- N - H
+FA <- rbinom(1, N, pFA)
+CR <- N - FA
+
+SDT_tab <- as.table(matrix(c(H, M, FA, CR), 
+                           nc = 2, 
+                           dimnames = list(Decision = c("Yes", "No"), 
+                                           Stimulus = c("Signal", "Not Signal"))))
+print(SDT_tab)
+```
+
+## SDT assumptions
+
+ 
+
+[**Noisy measurements**]{.underline}: on each trial the observer's information about the stimulus can be modelled as a random variable $X$, drawn from the *signal distribution* $f_S$, and drawn from the *noise distribution* $f_N$ otherwise.
+
+ 
+
+::: {style="font-size: 80%;"}
+-   In theory, no restrictions on how we choose $f_S$ and $f_N$.
+
+-   In practice they are often assumed to be Gaussian.
+:::
+
+## SDT distributions
+
+ 
+
+*Equal-variance* Gaussian SDT
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6
+#| fig-height: 4
+
+# settings
+d_prime <- 2
+sigma <- 1   
+alpha <- 0.5
+
+# support of random variable X (for plotting)
+supp_x <- seq(-3,5.5,length.out=500) 
+
+# calculate probability density and scale by prior probability
+fS <- alpha*dnorm(supp_x, mean=d_prime, sd=sigma)
+fN <- (1-alpha)*dnorm(supp_x, mean=0, sd=sigma)
+
+# plot 
+plot(supp_x, fS, type="l",lwd=2,col="black",xlab="X",ylab="p(X)")
+lines(supp_x, fN, lwd=2,col="grey")
+legend("topleft",c(expression("f"["S"]),expression("f"["N"])),col=c("black","grey"),lwd=2,bty="n")
+```
+
+::: {style="font-size: 70%;"}
+$\sigma = 1$ for both signal and noise distributions
+:::
+
+## SDT distributions
+
+ 
+
+*Un* equal-variance Gaussian SDT
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6
+#| fig-height: 4
+
+# settings
+d_prime <- 2
+sigma <- 1   
+alpha <- 0.5
+
+# support of random variable X (for plotting)
+supp_x <- seq(-3,5.5,length.out=500) 
+
+# calculate probability density and scale by prior probability
+fS <- alpha*dnorm(supp_x, mean=d_prime, sd=sigma*1.5)
+fN <- (1-alpha)*dnorm(supp_x, mean=0, sd=sigma)
+
+# plot 
+plot(supp_x, fS, type="l",lwd=2,col="black",xlab="X",ylab="p(X)", ylim=c(0, max(fN)))
+lines(supp_x, fN, lwd=2,col="grey")
+legend("topleft",c(expression("f"["S"]),expression("f"["N"])),col=c("black","grey"),lwd=2,bty="n")
+```
+
+::: {style="font-size: 70%;"}
+$\sigma_{f_S} = 1.5 \sigma_{f_N}$
+:::
+
+## SDT distributions
+
+ 
+
+*Extreme-value* SDT
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6
+#| fig-height: 4
+
+# parameters
+alpha  <- 0.5        # prior for Signal
+mu_S   <- 3          # location (Signal)
+beta_S <- 1          # scale > 0 (Signal)
+mu_N   <- 0          # location (Noise)
+beta_N <- 1          # scale > 0 (Noise)
+
+# Gumbel–min pdf
+dgumbel_min <- function(x, mu = 0, beta = 1) {
+  z <- (x - mu) / beta
+  exp(z - exp(z)) / beta
+  # equivalently: dgumbel_min(x, mu, beta) = dgumbel_max(-x, -mu, beta)
+}
+
+# support for plotting (wide enough around both modes)
+lo <- min(mu_S - 6 * beta_S, mu_N - 6 * beta_N)
+hi <- max(mu_S + 6 * beta_S, mu_N + 6 * beta_N)
+supp_x <- seq(lo, hi, length.out = 500)
+
+# scaled densities (by priors)
+fS <- alpha       * dgumbel_min(supp_x, mu_S, beta_S)
+fN <- (1 - alpha) * dgumbel_min(supp_x, mu_N, beta_N)
+
+# plot
+ylim_max <- max(fS, fN) * 1.05
+plot(supp_x, fS, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "p(X)", ylim = c(0, ylim_max))
+lines(supp_x, fN, lwd = 2, col = "gray")
+legend("topleft", legend = c(expression(f[S]), expression(f[N])),
+       col = c("black","gray"), lwd = 2, bty = "n")
+```
+
+::: {style="font-size: 70%;"}
+$\text{Gumbel}_{\text{min}}$ distribution to model recognition memory ([Meyer-Grant et al , 2025](https://osf.io/preprints/psyarxiv/qhrfj_v2))
+:::
+
+## SDT distributions
+
+ 
+
+*Exponential* SDT
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6
+#| fig-height: 4
+
+# parameters
+alpha   <- 0.5       # prior for Signal
+rate_S  <- 1         # lambda for Signal
+rate_N  <- 2         # lambda for Noise
+
+# support (nonnegative)
+supp_x <- seq(0, qexp(0.999, min(rate_S, rate_N)), length.out = 500)
+
+# scaled densities
+fS <- alpha      * dexp(supp_x, rate = rate_S)
+fN <- (1 - alpha) * dexp(supp_x, rate = rate_N)
+
+# plot
+ylim_max <- max(fS, fN) * 1.05
+plot(supp_x, fN, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "p(X)", ylim = c(0, ylim_max), xlim=c(0,5))
+lines(supp_x, fS, lwd = 2, col = "gray")
+legend("topright", legend = c(expression(f[N]), expression(f[S])),
+       col = c("gray","black"), lwd = 2, bty = "n")
+```
+
+## *Optimal* detection
+
+-   The decision rule that maximises the probability of a correct response is based on the *likelihood ratio* $$\frac{f_S(x)}{f_N(x)}$$
+
+-   The likelihood ratio is compared to a criterion ($\beta$), which should be set based on the prior probability of a signal $\alpha$,$$\beta=\frac{1-\alpha}{\alpha}$$
+
+-   That is, the observer should respond "yes" (*signal present*) whenever $$\frac{f_S(x)}{f_N(x)} \ge \beta$$
+
+::: notes
+Note that $\beta=1$ when signal and noise have the same probability
+:::
+
+## *Optimal* detection with asymmetric payoffs
+
+-   Payoffs are often asymmetric (e.g. a miss-detection may be more costly than a false alarm)
+
+ 
+
+-   We can set a criterion that maximizes *utility* taking the payoffs into account$$\beta=\frac{\left(1-\alpha \right)}{\alpha}  \frac{\left(U_{\text{CR}}-U_{\text{FA}}\right)}{\left(U_{\text{H}}-U_{\text{M}}\right)}$$\
+    (where $U_{\text{CR}}, U_{\text{FA}}, U_{\text{H}}$ and $U_{\text{M}}$ are the payoffs for correct rejections, false alarms, hits, and missed detections, respectively)
+
+ 
+
+-   Sometime referred to as *Bayes criterion*
+
+# Equal-variance, Gaussian signal detection theory (EV-SDT)
+
+## EV-SDT
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# 1
+
+## Shared settings
+d_prime <- 2
+sigma   <- 1
+alpha   <- 0.5
+c_val   <- 1
+
+supp_x  <- seq(-3, 5.5, length.out = 500)
+
+fS <- alpha      * dnorm(supp_x, mean = d_prime, sd = sigma)
+fN <- (1 - alpha)* dnorm(supp_x, mean = 0,       sd = sigma)
+
+y_peak_S <- alpha      * dnorm(d_prime, d_prime, sigma)
+y_peak_N <- (1 - alpha)* dnorm(0,       0,       sigma)
+ymax     <- max(y_peak_S, y_peak_N)
+ylim_use <- c(0, 1.25 * ymax)
+
+# helper: d' arrow on top
+draw_dprime <- function() {
+  yA <- 1.12 * ymax
+  arrows(0, yA, d_prime, yA, code = 3, angle = 90, length = 0.08, xpd = NA)
+  text(d_prime/2, yA, expression(italic(d)*"'"), pos = 3, offset = 0.3, xpd = NA)
+}
+
+
+plot(supp_x, fS, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_use)
+lines(supp_x, fN, lwd = 2, col = "grey")
+legend("topleft", legend = c(expression(f[S]), expression(f[N])),
+       col = c("black","grey"), lwd = 2, bty = "n")
+draw_dprime()
+```
+
+::: {style="font-size: 80%;"}
+In equal-variance SDT (EV-SDT) the observer's ability to discriminate signals from noise is captured by the *sensitivity* parameter $d'$
+:::
+
+## EV-SDT
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# helper: d' arrow on top
+draw_dprime <- function() {
+  yA <- 1.12 * ymax
+  arrows(0, yA, d_prime, yA, code = 3, angle = 90, length = 0.08, xpd = NA)
+  text(d_prime/2, yA, expression(italic(d)*"'"), pos = 3, offset = 0.3, xpd = NA)
+}
+
+
+plot(supp_x, fS, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_use)
+lines(supp_x, fN, lwd = 2, col = "grey")
+legend("topleft", legend = c(expression(f[S]), expression(f[N])),
+       col = c("black","grey"), lwd = 2, bty = "n")
+draw_dprime()
+```
+
+::::::: {style="font-size: 80%;"}
+:::::: columns
+::: {.column width="50%"}
+$$\begin{aligned}
+f_S(x)&=\frac{1}{\sigma\sqrt{2 \pi}} e^{-\frac{(x-d')^2}{2 \sigma^2}}\\
+&=\frac{1}{\sqrt{2 \pi}} e^{-\frac{(x-d')^2}{2}}
+\end{aligned}$$
+:::
+
+:::: {.column width="50%"}
+::: fragment
+$$f_N(x)=\frac{1}{\sqrt{2 \pi}} e^{-\frac{x^2}{2}}$$
+:::
+::::
+::::::
+:::::::
+
+## EV-SDT criterion
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# 2) Add vertical criterion line at c = 1, as tall as the peaks, label “c”
+
+plot(supp_x, fS, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_use)
+lines(supp_x, fN, lwd = 2, col = "grey")
+segments(c_val, 0, c_val, ymax, lty = 2, lwd = 2)
+text(c_val, ymax, labels = "c", pos = 3, offset = 0.6)
+legend("topleft", legend = c(expression(f[S]), expression(f[N])),
+       col = c("black","grey"), lwd = 2, bty = "n")
+# draw_dprime()
+```
+
+::: {style="font-size: 80%;"}
+In EV-SDT, the (optimal) likelihood ratio decision rule is equivalent to thresholding $X$ at
+
+$$c = \frac{1}{d'}\log \underbrace{\left[\frac{1-\alpha}{\alpha}\right]}_{\beta}+ \frac{d'}{2}$$ and choose "yes" whenever $x \ge c$.
+:::
+
+## EV-SDT: criterion
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# 3) Noise only + criterion + p(FA) shaded (reddish)
+
+fN_only <- (1 - alpha) * dnorm(supp_x, mean = 0, sd = sigma)
+ymax_N  <- max(fN_only); ylim_N <- c(0, 1.25 * ymax_N)
+
+plot(supp_x, fN_only, type = "l", lwd = 2, col = "grey",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_N)
+segments(c_val, 0, c_val, ymax_N, lty = 2, lwd = 2)
+text(c_val, ymax_N, labels = "c", pos = 3, offset = 0.6)
+
+# shade FA: x >= c under Noise
+ix  <- supp_x >= c_val
+polygon(c(c_val, supp_x[ix], max(supp_x)),
+        c(0,     fN_only[ix], 0),
+        col = adjustcolor("#dc3545", alpha.f = 0.35), border = NA)
+
+legend("topright", legend = expression(p('False Alarm')), bty = "n")
+# draw_dprime()
+```
+
+::: {style="font-size: 80%;"}
+$$p(\text{FA})=1-\Phi(c)$$
+
+(where $\Phi$ is the cumulative distribution function of the Gaussian with mean 0 and variance 1)
+:::
+
+## EV-SDT: criterion
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# 4) Noise only + criterion + p(CR) shaded (greenish)
+
+plot(supp_x, fN_only, type = "l", lwd = 2, col = "grey40",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_N)
+segments(c_val, 0, c_val, ymax_N, lty = 2, lwd = 2)
+text(c_val, ymax_N, labels = "c", pos = 3, offset = 0.6)
+
+# shade CR: x < c under Noise
+ix  <- supp_x <= c_val
+polygon(c(min(supp_x), supp_x[ix], c_val),
+        c(0,            fN_only[ix], 0),
+        col = adjustcolor("#198754", alpha.f = 0.35), border = NA)
+
+legend("topleft", legend = expression(p('Correct Rejection')), bty = "n")
+# draw_dprime()
+```
+
+::: {style="font-size: 80%;"}
+$$p(\text{CR})=\Phi(c)$$
+:::
+
+## EV-SDT: criterion
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# 5) Signal only + criterion + p(Hit) shaded (greenish)
+
+fS_only <- alpha * dnorm(supp_x, mean = d_prime, sd = sigma)
+ymax_S  <- max(fS_only); ylim_S <- c(0, 1.25 * ymax_S)
+
+plot(supp_x, fS_only, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_S)
+segments(c_val, 0, c_val, ymax_S, lty = 2, lwd = 2)
+text(c_val, ymax_S, labels = "c", pos = 3, offset = 0.6)
+
+# shade Hit: x >= c under Signal
+ix  <- supp_x >= c_val
+polygon(c(c_val, supp_x[ix], max(supp_x)),
+        c(0,     fS_only[ix], 0),
+        col = adjustcolor("#198754", alpha.f = 0.35), border = NA)
+
+legend("topright", legend = expression(p('Hit')), bty = "n")
+# draw_dprime()
+```
+
+::: {style="font-size: 80%;"}
+$$p(\text{H})=1 - \Phi(c - d')$$
+:::
+
+## EV-SDT: criterion
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig-cap-location: margin
+#| fig-width: 6.67
+#| fig-height: 4
+
+# 6) Signal only + criterion + p(Miss) shaded (reddish)
+
+plot(supp_x, fS_only, type = "l", lwd = 2, col = "black",
+     xlab = "X", ylab = "", yaxt = "n", bty = "n", ylim = ylim_S)
+segments(c_val, 0, c_val, ymax_S, lty = 2, lwd = 2)
+text(c_val, ymax_S, labels = "c", pos = 3, offset = 0.6)
+
+# shade Miss: x < c under Signal
+ix  <- supp_x <= c_val
+polygon(c(min(supp_x), supp_x[ix], c_val),
+        c(0,            fS_only[ix], 0),
+        col = adjustcolor("#dc3545", alpha.f = 0.35), border = NA)
+
+legend("topleft", legend = expression(p('Miss')), bty = "n")
+# draw_dprime()
+```
+
+::: {style="font-size: 80%;"}
+$$p(\text{M})= \Phi(c - d')$$
+:::
+
+## EV-SDT: optimal criterion derivation {background-color="#202A30"}
+
+::: {style="font-size: 80%;"}
+ 
+
+To derive the optimal-criterion, starts from:$$\frac{f_S(x)}{f_N(x)} \ge \beta$$
+
+substitute with the formula of the Gaussian probability density functions:$$\frac{\frac{1}{\sqrt{2 \pi}} e^{-\frac{(x-d')^2}{2}}}{\frac{1}{\sqrt{2 \pi}} e^{-\frac{x^2}{2}}} \ge \beta$$
+
+simplify and take the log of both sides:$$\log \left[\frac{e^{-\frac{(x-d')^2}{2}}}{e^{-\frac{x^2}{2}}} \right] \ge \log \left[ \beta \right]$$
+
+then solve for $x$
+:::
+
+## Fitting the EV-SDT model to data
+
+ 
+
+We can find maximum likelihood estimators (MLE) of $d'$ and $c$ by inverting the formulas for $p(\text{H})$ and $p(\text{FA})$ [^1]
+
+[^1]: The standard normal CDF is symmetric about 0: $\Phi(-z)=1-\Phi(z)$. That turns $1-\Phi(c)$ into $\Phi(-c)$ (and similarly for $c-d'$).
+
+$$p(\text{FA}) = 1 - \Phi(c) \implies c = - \Phi^{-1}\left[p(\text{FA})\right]$$  
+
+::: fragment
+$$\begin{aligned}p(\text{H}) = 1 - \Phi(c - d') \implies  d' & = \Phi^{-1}\left[p(\text{H})\right] +c \\ & =\Phi^{-1}\left[p(\text{H})\right] - \Phi^{-1}\left[p(\text{FA})\right]\end{aligned}$$
+:::
+
+ 
+
+::: {style="font-size: 80%;"}
+where $\Phi^{-1}$ is the inverse of the cumulative distribution function\
+(also referred to as *quantile* function).
+:::
+
+## The Receiver Operating Characteristic (ROC) curve
+
+::: {style="font-size: 85%;"}
+ 
+
+The ROC curve traces $(\mathrm{FA}(c), \mathrm{H}(c))$ as the criterion $c$ moves from liberal → conservative.
+
+ 
+
+```{r, echo=FALSE}
+#| fig.height: 5
+#| fig.width: 5
+#| fig-align: "center"
+
+library(lattice)
+x <- seq(0, 1, len = 500)
+xy <- expand.grid(pFA = x, pH = x)
+xy$dp <- with(xy, qnorm(pH) - qnorm(pFA))
+contourplot(dp ~ pFA + pH, data = xy,
+            subscripts = TRUE,
+            panel = function(x, y, z, subscripts, ...){
+              panel.levelplot(x, y, z, subscripts, at = c(0,1,2),
+                              labels = paste("d' =", c(0,1,2)),
+                              label.style = "mixed",
+                              contour = TRUE, region = FALSE,
+                              lwd=3, col="grey60")
+              # panel.points(0.0960, 0.9106,
+              #              pch = 16, col = "black", cex = 1.25)
+              },
+            xlab="p(FA)",
+            ylab="p(H)" )
+
+
+# set.seed(1)
+# N  <- 150; pH <- 0.9; pFA <- 0.1
+# H  <- rbinom(1, N, pH);  M  <- N - H
+# FA <- rbinom(1, N, pFA); CR <- N - FA
+# 
+# # observed rates
+# pH_hat  <- H  / (H + M)
+# pFA_hat <- FA / (FA + CR)
+# 
+# # EV–SDT MLEs (no correction)
+# dprime_hat <- qnorm(pH_hat) - qnorm(pFA_hat)
+# c_hat      <- -qnorm(pFA_hat)
+# 
+# # Theoretical ROC from d'
+# c_grid <- seq(-4, 4, length.out = 600)
+# FA_curve <- pnorm(-c_grid)
+# H_curve  <- pnorm(dprime_hat - c_grid)
+# 
+# # AUC: analytic and numeric (trapezoid)
+# auc_theory <- pnorm(dprime_hat / sqrt(2))
+# ord <- order(FA_curve)
+# auc_num <- sum(diff(FA_curve[ord]) * (head(H_curve[ord], -1) + tail(H_curve[ord], -1)) / 2)
+# 
+# # Plot
+# plot(FA_curve, H_curve, type="l", lwd=2, col="black",
+#      xlab="False alarm rate (FA)", ylab="Hit rate (H)",
+#      xaxs="i", yaxs="i")
+# abline(0,1,lty=2,col="grey60")                     # chance line
+# points(pFA_hat, pH_hat, pch=19, cex=1.1)          # observed point
+# legend("bottomright",
+#        legend = c("ROC (EV–SDT)", "chance", "observed (FA,H)"),
+#        lwd = c(2,1,NA), lty = c(1,2,NA), pch = c(NA, NA, 19),
+#        col = c("black","grey60","black"), bty="n")
+# 
+# mtext(sprintf("d' = %.2f   |   AUC (theory) = Φ(d'/√2) = %.3f   |   AUC (num) ≈ %.3f",
+#               dprime_hat, auc_theory, auc_num),
+#       side=3, line=0.2, cex=0.9)
+```
+
+-   Under EV–SDT with noise $\mathcal{N}(0,1)$ and signal $\mathcal{N}(d',1)$: $\mathrm{FA}(c)=\Phi(-c),\quad \mathrm{H}(c)=\Phi(d'-c).$
+
+-   Area under the curve (**AUC** or **aROC)** measures overall separability;\
+    for EV–SDT: $\mathrm{AUC}=\Phi\!\left(\frac{d'}{\sqrt{2}}\right).$
+:::
+
+## The zROC curve
+
+:::: {style="font-size: 85%;"}
+ 
+
+If we plot quantiles ($\Phi^-1\left[p(\text{FA})\right]$ and $\Phi^-1\left[p(\text{H})\right]$), also referred to as *Z-scores* ($z(\text{FA})$ and $z(\text{H})$), instead of probabilities the ROC curve becomes a straight line
+
+```{r, echo=FALSE}
+#| fig.height: 5
+#| fig.width: 5
+#| fig-align: "center"
+
+
+# Create sequence for probabilities (excluding 0 and 1 to avoid infinite z-scores)
+x <- seq(0.001, 0.999, len = 500)
+xy <- expand.grid(pFA = x, pH = x)
+
+# Calculate z-scores (inverse normal transformation)
+xy$zFA <- qnorm(xy$pFA)
+xy$zH <- qnorm(xy$pH)
+
+# Calculate d' using z-scores
+xy$dp <- with(xy, zH - zFA)
+
+# Create zROC plot
+contourplot(dp ~ zFA + zH, data = xy,
+            subscripts = TRUE,
+            panel = function(x, y, z, subscripts, ...){
+              panel.levelplot(x, y, z, subscripts, at = c(0, 1, 2),
+                              labels = paste("d' =", c(0, 1, 2)),
+                              label.style = "align",
+                              contour = TRUE, region = FALSE,
+                              lwd = 3, col = "grey60")
+              panel.abline(v = 0, h = 0, lty = 2)
+              },
+            xlab = "z(FA) - z-score of False Alarm Rate",
+            ylab = "z(H) - z-score of Hit Rate")
+
+```
+
+::: fragment
+For the EV-SDT model, the equation of the line is $z(\text{H}) = d' + z(\text{FA})$\
+(This implies that the slope is 1 and the intercept is the $d'$)
+:::
+::::
+
+# SDT as Generalised Linear Model (GLM)
+
+## EV–SDT as a GLM
+
+ 
+
+::::::: {style="font-size: 80%;"}
+Let $Y\in\{0,1\}$ be the binary response (*"Yes"=1*) and\
+$S\in\{0,1\}$ a binary predictor (*"signal present" = 1; "noise only" = 0*).
+
+ 
+
+::: fragment
+In equal-variance SDT, we have: $$\begin{aligned} p(\text{FA}) & = p(Y=1\mid S=0)= \Phi(-c) \\ p(\text{H})  & = p(Y=1\mid S=1)=\Phi(d'-c).\end{aligned}$$
+:::
+
+::: fragment
+Combining both cases: $$p(Y=1\mid S)=\Phi(-c + d' \,S )$$
+:::
+
+ 
+
+::: fragment
+This is equivalent to a Generalised Linear Model (GLM) with *probit* link function: $$\Phi^{-1}\left[P(Y=1\mid S)\right]=\beta_0+\beta_1 S,\quad
+\text{where }\beta_0=-c,\ \beta_1=d'.$$
+:::
+
+ 
+
+::: fragment
+[**Framing the EV-SDT model as a *probit* GLM lets you use standard packages to model multiple conditions and interactions or include random effects.**]{style="color:red;"}
+:::
+:::::::
+
+## Multilevel SDT
+
+Using GLM parametrisation it is easy to fit multilevel SDT model (e.g. using the `lme4` package in R)
+
+$$\Phi^{-1}\left[P(Y=1\mid S, i)\right]=(\beta_0 + \mu_{0,i})+(\beta_1+ \mu_{0,i}) S$$ where the parameters of the $i$-th subject are $$c=-(\beta_0+\mu_{0,i}),\ d'=\beta_1 +  \mu_{1,i}$$
+
+ 
+
+and we assume that participant-specific *random effects* (deviations from group-level *fixed* effects) have a multivariate Gaussian distribution
+
+$$\left[ {\begin{array}{c}
+{{\mu_0}}\\
+{{\mu_1}}
+\end{array}} \right] \sim\cal N \left( {\left[ {\begin{array}{c}
+0 \\ 0 \end{array}} \right],\Sigma  } \right)$$
+
+::: fragment
+[Multilevel models pool information across participants, making estimates more robust, and can be particularly useful when many repetitions aren’t feasible]{style="color:red;"} (*e.g. knowledge questions, see Activity 4 in the worksheet*).
+:::
+
+# Unequal-variance SDT
+
+## Unequal-variance SDT (UV-SDT)
+
+:::::: {style="font-size: 85%;"}
+In some settings the **signal** is not just shifted but also **noisier** than the baseline\
+(e.g., neural firing rates: higher mean → higher variance).
+
+-   Noise:$X\sim\mathcal N(0,\,1)$
+-   Signal: $X\sim\mathcal N(d',\,\sigma^2)$ with $\sigma\neq 1$
+
+ 
+
+::: fragment
+The log-likelihood ratio (LLR) becomes a quadratic function of $x$: $\log\!\frac{f_S(x)}{f_N(x)}= -\frac{1}{2\sigma^2}\Big[(1-\sigma^2)x^2 - 2d' x + d'^2 + 2\sigma^2\log\sigma\Big].$
+:::
+
+ 
+
+::: fragment
+The decision rule is always $\log\!\frac{f_S(x)}{f_N(x)}>\log\beta$.
+:::
+
+::: fragment
+For $\sigma>1$, this inequality is satisfied in *two tails* → *two criteria*.
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig.height: 3.6
+#| fig.width: 7
+
+par(mar = c(4,4,2,1))
+
+# Parameters
+d_prime <- 3
+sigmaS  <- 2      # signal SD (>1)
+logbeta <- 0      # equal priors/costs
+
+# Quadratic LLR = log fS - log fN; solve LLR = logbeta
+uv_criteria <- function(dp, sig, logbeta = 0) {
+  a <- 1 - sig^2
+  b <- -2 * dp
+  c <- dp^2 + 2 * sig^2 * (log(sig) + logbeta)
+  if (abs(a) < 1e-12) return(dp/2 + logbeta/dp)  # EV-SDT limit
+  D <- b^2 - 4 * a * c
+  if (D < 0) return(numeric(0))
+  sort((-b + c(-1, 1) * sqrt(D)) / (2 * a))
+}
+
+crit <- uv_criteria(d_prime, sigmaS, logbeta)
+
+# Densities
+Xi <- seq(-6, 10, length.out = 600)
+fN <- dnorm(Xi, mean = 0,      sd = 1)
+fS <- dnorm(Xi, mean = d_prime, sd = sigmaS)
+
+plot(Xi, fN, type = "l", lwd = 3, col = "grey",
+     xlab = "X", ylab = "density")
+lines(Xi, fS, lwd = 3, col = "black")
+abline(v = crit, col = "red", lwd = 2)
+legend("topright",
+       legend = c(expression(f[N]), expression(f[S]), "criteria"),
+       col = c("grey","black","red"), lwd = c(3,3,2), bty = "n")
+
+```
+:::
+::::::
+
+## Unequal-variance SDT (UV-SDT)
+
+::: {style="font-size: 85%;"}
+This is more clearly seen when looking at the log-likelihood ratio.
+
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig.height: 5
+#| fig.width: 7
+d_prime <- 3
+sigmaS  <- 2
+logbeta <- 0
+
+LLR <- function(x, dp, sig) {
+  log(dnorm(x, dp, sig)) - log(dnorm(x, 0, 1))
+}
+
+Xi  <- seq(-6, 10, length.out = 1000)
+llr <- LLR(Xi, d_prime, sigmaS)
+
+crit <- {
+  a <- 1 - sigmaS^2
+  b <- -2 * d_prime
+  c <- d_prime^2 + 2 * sigmaS^2 * (log(sigmaS) + logbeta)
+  if (abs(a) < 1e-12) d_prime/2 + logbeta/d_prime else {
+    D <- b^2 - 4*a*c; if (D < 0) numeric(0) else sort((-b + c(-1,1)*sqrt(D))/(2*a))
+  }
+}
+
+plot(Xi, llr, type = "l", lwd = 2, xlab = "X", ylab = "log-likelihood ratio")
+abline(h = logbeta, lty = 2, col = "grey40")
+abline(v = crit,    lty = 1, col = "red")
+legend("topleft", legend = c("LLR(x)", "log β", "criteria"),
+       col = c("black","grey40","red"), lty = c(1,2,1), lwd = c(2,1,1), bty = "n")
+```
+
+*Intuition*: with $\sigma > 1$, extreme (low or high) evidence is more likely under the signal than the noise, so “Yes” in both tails and “No” in the middle.
+:::
+
+## ROC & zROC in equal vs unequal variance (and testing EV)
+
+:::::: {style="font-size: 85%;"}
+-   Different variance in signal/noise distributions change the shape of the ROC curve
+-   The zROC curve remains a straight line, but the slope is $\ne1$ anymore
+-   Assuming noise Std. fixed at 1, the zROC slope is $\frac{1}{\sigma}$
+
+::: fragment
+```{r, echo=FALSE}
+#| fig-align: 'center'
+#| fig.height: 3.9
+#| fig.width: 7
+# Compare EV and UV ROC & zROC
+
+dprime   <- 2
+sigma_UV <- 1.6
+s_uv     <- 1 / sigma_UV
+a_uv     <- dprime / sigma_UV
+
+zFA <- seq(-4, 4, length.out = 800)
+
+op <- par(mfrow = c(1,2), mar = c(4,4,2,1))
+
+
+# ROC (left panel) generated from the same z parameterization (smooth ends)
+FA   <- pnorm(zFA)
+H_ev <- pnorm(zFA + dprime)
+H_uv <- pnorm(a_uv + s_uv * zFA)
+
+plot(FA, H_ev, type = "l", lwd = 2, col = "black",
+     xlab = "p(FA)", ylab = "p(H)", xaxs = "i", yaxs = "i")
+lines(FA, H_uv, lwd = 2, col = "grey40")
+abline(0,1,lty=2,col="grey70")
+legend("bottomright", c("EV (σ=1)", sprintf("UV (σ=%.1f)", sigma_UV)),
+       col = c("black","grey40"), lwd = 2, bty = "n")
+
+# zROC (right panel)
+plot(zFA, zFA + dprime, type = "l", lwd = 2, col = "black",
+     xlab = "z(FA)", ylab = "z(H)")
+abline(v=0,lty=2,col="grey70")
+abline(h=0,lty=2,col="grey70")
+lines(zFA, a_uv + s_uv * zFA, lwd = 2, col = "grey40")
+legend("topleft",
+       legend = c(sprintf("EV slope = 1"),
+                  sprintf("UV slope ≈ %.3f (< 1)", s_uv)),
+       bty = "n")
+
+par(op)
+
+```
+:::
+
+:::: fragment
+::: small
+-   Measuring the slope of the zROC is a way to assess whether the equal-variance assumption is warranted.
+-   Measuring the slope is not simple! We need to measure $p(\text{H})$ and $p(\text{FA})$ under varying criterion setting, which should be induced by changing the prior or the payoffs
+-   An alternative could be using rating scales, but there are pitfalls (e.g. [Maniscalco & Lau, 2014](https://link.springer.com/chapter/10.1007/978-3-642-45190-4_3))
+:::
+::::
+::::::
+
+# 
+
+## Take-home messages
+
+-   SDT cleanly separates **sensitivity** ($d'$) from **bias** ($c$) in detection tasks.
+
+-   Framing SDT as a **probit GLM** lets you use standard tools: **mixed-effects** (random effects), multi-condition designs, interactions, covariates, and Bayesian fitting.
+
+-   Don’t assume equal variance by default. If possible, check the zROC slope; alternatively critically evaluate why assuming equal variance is warranted.
+
+-   With minor tweaks, the same machinery (optimal criteria, ROC/zROC, AUC) applies to discrimination tasks as well as detection.
+
+## References
+
+::: nonincremental
+-   Green, D. M., & Swets, J. A. (1966). *Signal detection theory and psychophysics.* Wiley.
+
+-   Knoblauch, K., & Maloney, L. T. (2012). *Modeling psychophysical data in R.* Springer. <https://doi.org/10.1007/978-1-4614-4475-6>
+
+-   Wickens, T. D. (2001). *Elementary signal detection theory.* Oxford University Press.
+:::
+
+<!-- ## Sensitivity in UV–SDT: the $d_a$ index -->
+
+<!-- :::: {style="font-size: 85%;"} -->
+
+<!-- When variances differ sensitivity is not well summarised by $d'$.\ -->
+
+<!-- An alternative is $d_a$, defined from the **zROC** line. -->
+
+<!-- Let the **zROC** be -->
+
+<!-- $$z(\mathrm{H}) = a + s\,z(\mathrm{FA}),$$ -->
+
+<!-- where $z=\Phi^{-1}$, $s$ is the **zROC slope** (for noise SD fixed to 1, $s=1/\sigma$), and $a$ the intercept. -->
+
+<!-- Then -->
+
+<!-- $$\boxed{\; -->
+
+<!-- d_a \;=\; \sqrt{\frac{2}{1+s^2}}\;\big[z(\mathrm{H}) - s\,z(\mathrm{FA})\big] -->
+
+<!-- \;=\; \sqrt{\frac{2}{1+s^2}}\;a -->
+
+<!-- \;}$$ -->
+
+<!-- - If **equal variance** (\(\sigma=1\Rightarrow s=1\)): \(d_a = z(\mathrm{H})-z(\mathrm{FA}) = d'\). -->
+
+<!-- - If **unequal variance** (\(s\neq 1\)): \(d_a\) stays **criterion-free** and reflects separation scaled by average SD. -->
+
+<!-- ::: fragment -->
+
+<!-- ```{r, echo=FALSE} -->
+
+<!-- #| fig-align: 'center' -->
+
+<!-- #| fig.height: 3.2 -->
+
+<!-- #| fig.width: 7 -->
+
+<!-- # Example: build a small zROC, estimate slope/intercept, compute d_a -->
+
+<!-- # Choose a model (UV): d′=2, sigma=1.6 -> slope s = 1/sigma = 0.625 -->
+
+<!-- dprime <- 2; sigmaS <- 1.6 -->
+
+<!-- c_grid <- seq(-3, 5, length.out = 25) -->
+
+<!-- FA <- 1 - pnorm(c_grid)                      # FA(c) -->
+
+<!-- H  <- 1 - pnorm((c_grid - dprime)/sigmaS)    # H(c) -->
+
+<!-- zFA <- qnorm(pmin(pmax(FA, 1e-6), 1 - 1e-6)) -->
+
+<!-- zH  <- qnorm(pmin(pmax(H,  1e-6), 1 - 1e-6)) -->
+
+<!-- fit <- lm(zH ~ zFA) -->
+
+<!-- s_hat <- unname(coef(fit)[2])     # zROC slope (≈ 1/sigmaS) -->
+
+<!-- a_hat <- unname(coef(fit)[1])     # intercept -->
+
+<!-- d_a_hat <- sqrt(2/(1 + s_hat^2)) * a_hat -->
+
+<!-- round(c(slope = s_hat, intercept = a_hat, d_a = d_a_hat), 3) -->
+
+<!-- # Plot zROC -->
+
+<!-- plot(zFA, zH, pch = 19, cex = .7, xlab = "z(FA)", ylab = "z(H)") -->
+
+<!-- abline(fit, col = "red", lwd = 2) -->
+
+<!-- ``` -->
+
+<!-- ::: -->
+
+<!-- :::: -->
