@@ -13,7 +13,12 @@ execute:
 ---
 
 
-## Setup
+
+## Activity 1 — Baseline ($\alpha$ = 0.5)
+
+> Goal: Plot the two scaled densities and the optimal criterion; check that $c$ is at the cross-over point of hte probability density functions.
+
+#### Setup
 
 ```{r}
 # Helper: optimal criterion for equal-variance normals (mu_N=0, mu_S=d′)
@@ -32,10 +37,6 @@ sdtdens <- function(x, d_prime, alpha = 0.5) {
 
 ```
 
-
-## Activity 1 — Baseline ($\alpha$ = 0.5)
-
-> Goal: Plot the two scaled densities and the optimal criterion; check that c is at the cross-over point.
 
 ```{r}
 #| fig-align: 'center'
@@ -402,11 +403,14 @@ print(fit, pars=c("c","dprime"), probs = c(0.025, 0.975))
 
 :::
 
-## Activity 4 — Multilevel EV-SDT
+## Activity 5 — Multilevel EV-SDT
 
 
 
-We will use data from a study about misinformation in which participants were asked to discriminate true and false statements [(Lisi, 2023)](https://royalsocietypublishing.org/doi/full/10.1098/rsos.230417). Participants judged whether short statements were true or false.
+We will use data from a study about misinformation in which participants were asked to discriminate true and false statements [(Lisi, 2023)](https://royalsocietypublishing.org/doi/full/10.1098/rsos.230417)[^lisi23ref]. Participants judged whether short statements were true or false.
+
+The dataset is contained in the file `Lisi2023_covidmisinfo.csv`, available here:
+
 For each trial you have:
 - `respT` (0/1): participant judged the statement True (1) or not (0)
 - `isTrue` (0/1): whether the statement was actually true (1) or noise/false (0)
@@ -414,7 +418,11 @@ For each trial you have:
 - `type`: item category; we use `type == "science"` here.
 
 ```{r}
+# load data (assuming they are in a 'data' subfolder located in current working directory)
 d <- read.csv("./data/Lisi2023_covidmisinfo.csv")
+
+# or use this to import the data directly from github:
+d <- read.csv("https://raw.githubusercontent.com/mattelisi/SDT-workshop/refs/heads/main/data/Lisi2023_covidmisinfo.csv")
 
 # subset to "science"
 dd <- subset(d, type == "science")
@@ -422,6 +430,8 @@ dd <- subset(d, type == "science")
 str(dd)
 ```
 
+
+[^lisi23ref]: Lisi, M. (2023). Navigating the COVID-19 infodemic: The influence of metacognitive efficiency on health behaviours and policy attitudes. _Royal Society Open Science, 10_, 230417. [https://doi.org/10.1098/rsos.230417](https://doi.org/10.1098/rsos.230417)
 
 We’ll work on the “science” subset and compare two estimates:
 
@@ -524,7 +534,50 @@ lines(lowess(cmp$criterion, cmp$c_glmm, f = .7), lwd = 2)
 This reveal the compression or "shrinkage" in the multilevel model, which mitigates the large spread of values in the individual estimates.
 
 
-## Activity 5 — Unequal-variance SDT
+::: callout-tip
+
+#### Optional: SDT for patients’ judgements about antibiotic necessity
+
+AS an additional example, the dataset `Theodoropoulou_RR.csv` contains data from a registered-report study[^andriana-paper] that used SDT study patients’ expectations for antibiotics under different communication conditions. In this case the 
+
+
+```{r}
+# load data (assuming they are in a 'data' subfolder located in current working directory)
+dRR <- read.csv("./data/Theodoropoulou_RR.csv")
+
+# or use this to import the data directly from github:
+dRR <- read.csv("https://raw.githubusercontent.com/mattelisi/SDT-workshop/refs/heads/main/data/Theodoropoulou_RR.csv")
+
+# display variables
+str(dRR)
+```
+
+**Variables (key fields)**  
+
+- `ID` — participant ID  
+- `scenario` — vignette label (clinical case)  
+- `condition` — communication condition (**1 = control**; other values = experimental messages)  
+- `anty` — participant response (**1 = "antibiotics needed"**, **0 = "not needed"**) → this is the **Yes/No** decision  
+- `anti_needed` — ground truth (**1 = antibiotics indicated**, **0 = not indicated**) per **NHS** guidance → this is the **Signal (S=1) / Noise (S=0)** flag  
+- `type` — vignette class (e.g., viral vs bacterial categories; 75% are viral)  
+
+**Example vignette (viral; antibiotics not needed):**  
+
+> _"For the past five days you have been feeling ill. You have had a sore throat and a runny nose, and you have been experiencing muscle aches and general fatigue. You have also developed a dry hacking cough. However, you have a normal temperature and no breathlessness. Upon examination, your GP tells you that your lungs sound clear."_
+
+**Suggested exercises:**
+
+- Map to SDT: treat `anti_needed` as the state (Signal=1 / Noise=0) and `anty` as the response (Yes=1 / No=0)
+- Estimate EV–SDT parameters, using either independent per-participants fit, or a multilevel model. You can start by modelling only the control condition, or by including all conditions and interactions.
+- Compute the *optimal* criterion, under the prior in the design (base rate of "antibiotics needed" cases is 0.75), and compared the observed biases to the optimal ones.
+
+
+[^andriana-paper]: Theodoropoulou, A., Lisi, M., Rolision, J., & Sirota, M. (2025). The effects of communicating illness diagnostic and treatment information and C-reactive protein test results on people's antibiotic expectations. _British Journal of Health Psychology, 30_, e70020. [https://doi.org/10.1111/bjhp.70020](https://doi.org/10.1111/bjhp.70020)
+
+:::
+
+
+## Activity 6 — Unequal-variance SDT
 
 We’ll (1) simulate UV–SDT data at ≥2 criteria, then (2) maximise the binomial likelihood over $(d', \sigma, \{\log\beta_j\})$. 
 

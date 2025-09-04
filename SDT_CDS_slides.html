@@ -801,14 +801,12 @@ f_S(x)&amp;=\frac{1}{\sigma\sqrt{2 \pi}} e^{-\frac{(x-d')^2}{2 \sigma^2}}\\
 <section id="the-receiver-operating-characteristic-roc-curve" class="slide level2">
 <h2>The Receiver Operating Characteristic (ROC) curve</h2>
 <div style="font-size: 85%;">
-<p>&nbsp;</p>
 <p>The ROC curve traces <span class="math inline">\((\mathrm{FA}(c), \mathrm{H}(c))\)</span> as the criterion <span class="math inline">\(c\)</span> moves from liberal → conservative.</p>
-<p>&nbsp;</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-15-1.png" class="quarto-figure quarto-figure-center" width="480"></p>
+<p><img data-src="SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-15-1.png" class="quarto-figure quarto-figure-center" width="432"></p>
 </figure>
 </div>
 </div>
@@ -823,13 +821,12 @@ for EV–SDT: <span class="math inline">\(\mathrm{AUC}=\Phi\!\left(\frac{d'}{\sq
 <section id="the-zroc-curve" class="slide level2">
 <h2>The zROC curve</h2>
 <div style="font-size: 85%;">
-<p>&nbsp;</p>
 <p>If we plot quantiles (<span class="math inline">\(\Phi^-1\left[p(\text{FA})\right]\)</span> and <span class="math inline">\(\Phi^-1\left[p(\text{H})\right]\)</span>), also referred to as <em>Z-scores</em> (<span class="math inline">\(z(\text{FA})\)</span> and <span class="math inline">\(z(\text{H})\)</span>), instead of probabilities the ROC curve becomes a straight line</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-16-1.png" class="quarto-figure quarto-figure-center" width="480"></p>
+<p><img data-src="SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-16-1.png" class="quarto-figure quarto-figure-center" width="432"></p>
 </figure>
 </div>
 </div>
@@ -883,6 +880,36 @@ for EV–SDT: <span class="math inline">\(\mathrm{AUC}=\Phi\!\left(\frac{d'}{\sq
 <div class="fragment">
 <p><span style="color:red;">Multilevel models pool information across participants, making estimates more robust, and can be particularly useful when many repetitions aren’t feasible</span> (<em>e.g.&nbsp;knowledge questions, see Activity 4 in the worksheet</em>).</p>
 </div>
+</section>
+<section id="signal-noise-beyond-the-psychophysics-lab" class="slide level2">
+<h2>Signal &amp; noise beyond the (psychophysics) lab</h2>
+<p>&nbsp;</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/noise1.bmp" class="quarto-figure quarto-figure-center" style="width:50.0%"></p>
+</figure>
+</div>
+<p><br></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/signal1.bmp" class="quarto-figure quarto-figure-center" style="width:50.0%"></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/false_poli.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></p>
+</figure>
+</div>
+<p><br></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/true_poli.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></p>
+</figure>
+</div>
+</div></div>
 </section></section>
 <section>
 <section id="unequal-variance-sdt" class="title-slide slide level1 inverse center" data-background-color="#EB641E">
@@ -936,9 +963,9 @@ for EV–SDT: <span class="math inline">\(\mathrm{AUC}=\Phi\!\left(\frac{d'}{\sq
 <p><em>Intuition</em>: with <span class="math inline">\(\sigma &gt; 1\)</span>, extreme (low or high) evidence is more likely under the signal than the noise, so “Yes” in both tails and “No” in the middle.</p>
 </div>
 </section>
-<section id="roc-zroc-in-equal-vs-unequal-variance-and-testing-ev" class="slide level2">
-<h2>ROC &amp; zROC in equal vs unequal variance (and testing EV)</h2>
-<div style="font-size: 85%;">
+<section id="roc-zroc-in-equal-vs-unequal-variance" class="slide level2">
+<h2>ROC &amp; zROC in equal vs unequal variance</h2>
+<div style="font-size: 75%;">
 <ul>
 <li class="fragment">Different variance in signal/noise distributions change the shape of the ROC curve</li>
 <li class="fragment">The zROC curve remains a straight line, but the slope is <span class="math inline">\(\ne1\)</span> anymore</li>
@@ -956,13 +983,11 @@ for EV–SDT: <span class="math inline">\(\mathrm{AUC}=\Phi\!\left(\frac{d'}{\sq
 </div>
 </div>
 <div class="fragment">
-<div class="small">
 <ul>
-<li class="fragment">Measuring the slope of the zROC is a way to assess whether the equal-variance assumption is warranted.</li>
-<li class="fragment">Measuring the slope is not simple! We need to measure <span class="math inline">\(p(\text{H})\)</span> and <span class="math inline">\(p(\text{FA})\)</span> under varying criterion setting, which should be induced by changing the prior or the payoffs</li>
-<li class="fragment">An alternative could be using rating scales, but there are pitfalls (e.g.&nbsp;<a href="https://link.springer.com/chapter/10.1007/978-3-642-45190-4_3">Maniscalco &amp; Lau, 2014</a>)</li>
+<li class="fragment">The slope of the zROC is a way to assess whether the equal-variance assumption is warranted.</li>
+<li class="fragment">Measuring the slope is not simple! Need to measure <span class="math inline">\(p(\text{H})\)</span> and <span class="math inline">\(p(\text{FA})\)</span> at multiple criteria by manipulating priors/payoffs</li>
+<li class="fragment">Rating scales as a workaround, but beware pitfalls (e.g.&nbsp;<a href="https://link.springer.com/chapter/10.1007/978-3-642-45190-4_3">Maniscalco &amp; Lau, 2014</a>)</li>
 </ul>
-</div>
 </div>
 </div>
 </section></section>
@@ -974,8 +999,8 @@ for EV–SDT: <span class="math inline">\(\mathrm{AUC}=\Phi\!\left(\frac{d'}{\sq
 <section id="take-home-messages" class="slide level2">
 <h2>Take-home messages</h2>
 <ul>
-<li class="fragment"><p>SDT cleanly separates <strong>sensitivity</strong> (<span class="math inline">\(d'\)</span>) from <strong>bias</strong> (<span class="math inline">\(c\)</span>) in detection tasks.</p></li>
-<li class="fragment"><p>Framing SDT as a <strong>probit GLM</strong> lets you use standard tools: <strong>mixed-effects</strong> (random effects), multi-condition designs, interactions, covariates, and Bayesian fitting.</p></li>
+<li class="fragment"><p>SDT allow separating <strong>sensitivity</strong> (<span class="math inline">\(d'\)</span>) from <strong>bias</strong> (<span class="math inline">\(c\)</span>) in detection tasks.</p></li>
+<li class="fragment"><p>Framing SDT as a <em>probit GLM</em> lets you use standard tools: <em>mixed-effects</em> (random effects), multi-condition designs, interactions, covariates, and Bayesian fitting.</p></li>
 <li class="fragment"><p>Don’t assume equal variance by default. If possible, check the zROC slope; alternatively critically evaluate why assuming equal variance is warranted.</p></li>
 <li class="fragment"><p>With minor tweaks, the same machinery (optimal criteria, ROC/zROC, AUC) applies to discrimination tasks as well as detection.</p></li>
 </ul>

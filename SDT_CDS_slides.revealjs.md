@@ -453,17 +453,15 @@ where $\Phi^{-1}$ is the inverse of the cumulative distribution function\
 ## The Receiver Operating Characteristic (ROC) curve
 
 ::: {style="font-size: 85%;"}
- 
 
 The ROC curve traces $(\mathrm{FA}(c), \mathrm{H}(c))$ as the criterion $c$ moves from liberal → conservative.
 
- 
 
 
 
 ::: {.cell layout-align="center"}
 ::: {.cell-output-display}
-![](SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-15-1.png){fig-align='center' width=480}
+![](SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-15-1.png){fig-align='center' width=432}
 :::
 :::
 
@@ -478,7 +476,6 @@ The ROC curve traces $(\mathrm{FA}(c), \mathrm{H}(c))$ as the criterion $c$ move
 ## The zROC curve
 
 :::: {style="font-size: 85%;"}
- 
 
 If we plot quantiles ($\Phi^-1\left[p(\text{FA})\right]$ and $\Phi^-1\left[p(\text{H})\right]$), also referred to as *Z-scores* ($z(\text{FA})$ and $z(\text{H})$), instead of probabilities the ROC curve becomes a straight line
 
@@ -486,7 +483,7 @@ If we plot quantiles ($\Phi^-1\left[p(\text{FA})\right]$ and $\Phi^-1\left[p(\te
 
 ::: {.cell layout-align="center"}
 ::: {.cell-output-display}
-![](SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-16-1.png){fig-align='center' width=480}
+![](SDT_CDS_slides_files/figure-revealjs/unnamed-chunk-16-1.png){fig-align='center' width=432}
 :::
 :::
 
@@ -552,6 +549,32 @@ $$\left[ {\begin{array}{c}
 [Multilevel models pool information across participants, making estimates more robust, and can be particularly useful when many repetitions aren’t feasible]{style="color:red;"} (*e.g. knowledge questions, see Activity 4 in the worksheet*).
 :::
 
+
+## Signal & noise beyond the (psychophysics) lab
+
+ 
+
+:::: {.columns}
+::: {.column width="50%"}
+
+![](img/noise1.bmp){fig-align="center" width="50%"}
+
+<br>
+
+![](img/signal1.bmp){fig-align="center" width="50%"}
+
+:::
+::: {.column width="50%"}
+
+![](img/false_poli.png){fig-align="center" width="80%"}
+
+<br>
+
+![](img/true_poli.png){fig-align="center" width="80%"}
+
+:::
+::::
+
 # Unequal-variance SDT
 
 ## Unequal-variance SDT (UV-SDT)
@@ -608,9 +631,9 @@ This is more clearly seen when looking at the log-likelihood ratio.
 *Intuition*: with $\sigma > 1$, extreme (low or high) evidence is more likely under the signal than the noise, so “Yes” in both tails and “No” in the middle.
 :::
 
-## ROC & zROC in equal vs unequal variance (and testing EV)
+## ROC & zROC in equal vs unequal variance
 
-:::::: {style="font-size: 85%;"}
+:::::: {style="font-size: 75%;"}
 -   Different variance in signal/noise distributions change the shape of the ROC curve
 -   The zROC curve remains a straight line, but the slope is $\ne1$ anymore
 -   Assuming noise Std. fixed at 1, the zROC slope is $\frac{1}{\sigma}$
@@ -628,11 +651,11 @@ This is more clearly seen when looking at the log-likelihood ratio.
 :::
 
 :::: fragment
-::: small
--   Measuring the slope of the zROC is a way to assess whether the equal-variance assumption is warranted.
--   Measuring the slope is not simple! We need to measure $p(\text{H})$ and $p(\text{FA})$ under varying criterion setting, which should be induced by changing the prior or the payoffs
--   An alternative could be using rating scales, but there are pitfalls (e.g. [Maniscalco & Lau, 2014](https://link.springer.com/chapter/10.1007/978-3-642-45190-4_3))
-:::
+
+-   The slope of the zROC is a way to assess whether the equal-variance assumption is warranted.
+-   Measuring the slope is not simple! Need to measure $p(\text{H})$ and $p(\text{FA})$ at multiple criteria by manipulating priors/payoffs
+-   Rating scales as a workaround, but beware pitfalls (e.g. [Maniscalco & Lau, 2014](https://link.springer.com/chapter/10.1007/978-3-642-45190-4_3))
+
 ::::
 ::::::
 
@@ -640,9 +663,9 @@ This is more clearly seen when looking at the log-likelihood ratio.
 
 ## Take-home messages
 
--   SDT cleanly separates **sensitivity** ($d'$) from **bias** ($c$) in detection tasks.
+-   SDT allow separating **sensitivity** ($d'$) from **bias** ($c$) in detection tasks.
 
--   Framing SDT as a **probit GLM** lets you use standard tools: **mixed-effects** (random effects), multi-condition designs, interactions, covariates, and Bayesian fitting.
+-   Framing SDT as a *probit GLM* lets you use standard tools: *mixed-effects* (random effects), multi-condition designs, interactions, covariates, and Bayesian fitting.
 
 -   Don’t assume equal variance by default. If possible, check the zROC slope; alternatively critically evaluate why assuming equal variance is warranted.
 
