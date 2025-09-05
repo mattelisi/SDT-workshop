@@ -2,6 +2,18 @@
 title: "Signal Detection Theory"
 subtitle: "<br>_CDS Summer School_<br>"
 author: "Matteo Lisi"
+date-released: 2025-09-08
+url: https://github.com/mattelisi/SDT-workshop
+preferred-citation:
+  type: webpage
+  title: "Signal Detection Theory Workshop — CDS Summer School (2025)"
+  authors:
+    - family-names: Lisi
+      given-names: Matteo
+  year: 2025
+  month: 9
+  day: 8
+  url: https://mlisi.xyz/SDT-workshop/
 format:
   revealjs:
     logo: img/logo-small-london-cmyk.jpg
@@ -38,16 +50,25 @@ par(cex = 1.15)
 
    
    
+   
+   
+   
 
+:::: fragment
 
 ::: {style="font-size: 70%;"}
+
+:::: nonincremental
 Links:
 
 - slides & worksheet: [https://mlisi.xyz/SDT-workshop](https://mlisi.xyz/SDT-workshop/)
 - Github repository: [https://github.com/mattelisi/SDT-workshop](https://github.com/mattelisi/SDT-workshop)
 
+::::
+
 :::
 
+::::
 
 # (1) Signal Detection Theory
 
