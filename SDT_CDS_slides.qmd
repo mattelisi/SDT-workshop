@@ -36,6 +36,19 @@ par(cex = 1.15)
 4.  Unequal-variance SDT
 :::
 
+   
+   
+
+
+::: {style="font-size: 70%;"}
+Links:
+
+- slides & worksheet: [https://mlisi.xyz/SDT-workshop](https://mlisi.xyz/SDT-workshop/)
+- Github repository: [https://github.com/mattelisi/SDT-workshop](https://github.com/mattelisi/SDT-workshop)
+
+:::
+
+
 # (1) Signal Detection Theory
 
 ## Signal Detection Theory (SDT)
@@ -71,6 +84,7 @@ par(cex = 1.15)
 ::: {.column width="55%"}
    
 
+```{=html}
 <table style="margin:auto; text-align:center; border-collapse:collapse;">
 <tbody><tr>
 <td rowspan="2" style="border:none;">
@@ -117,6 +131,7 @@ Correct rejection (CR)
 </td>
 </tr>
 </tbody></table>
+```
 
 :::
 

@@ -4,6 +4,7 @@ This repository hosts the materials for the **Signal Detection Theory (SDT)** wo
 
 - [**Slides (HTML)**](SDT_CDS_slides.html)
 - [**Worksheet (HTML)**](SDT_worksheet.html)
+- [**Source code & data (GitHub)**](https://github.com/mattelisi/SDT-workshop)
 
 Author: Matteo Lisi
 matteo.lisi (at) rhul.ac.uk
