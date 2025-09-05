@@ -12,8 +12,7 @@ format:
     code-line-numbers: false
     echo: true         # show code by default
     theme: [default, matteo_rhul.css]
-editor: visual
-keep-md: true
+editor: source
 filters: [bg_style.lua]
 ---
 
@@ -72,16 +71,53 @@ par(cex = 1.15)
 ::: {.column width="55%"}
    
 
-+------------+------------+------------------------+
-|            |            | *Stimulus space*       |
-+------------+------------+------------------------+
-|            | **Signal** | **Not signal**         |
-+------------+------------+------------------------+
-| *Decision\ | **Yes**    | Hit (H)                |
-| space*     |            |                        |
-+------------+------------+------------------------+
-| **No**     | Miss (M)   | Correct rejection (CR) |
-+------------+------------+------------------------+
+<table style="margin:auto; text-align:center; border-collapse:collapse;">
+<tbody><tr>
+<td rowspan="2" style="border:none;">
+</td>
+<td rowspan="1" style="border:none;">
+</td>
+<td colspan="2" style="border-bottom:1px solid black;">
+<em>Stimulus space</em>
+</td>
+</tr>
+<tr>
+<td style="border:none;">
+</td>
+<td style="border-bottom:1px solid black; border-right:1px solid black;">
+<strong>Signal</strong>
+</td>
+<td style="border-bottom:1px solid black;">
+<strong>Not signal</strong>
+</td>
+</tr>
+<tr>
+<td rowspan="2" style="border-top:none; border-bottom:none; border-left:none; border-right:1px solid black; padding:0 8px;">
+<em>Decision<br>space</em>
+</td>
+<td style="border-right:1px solid black;">
+<strong>Yes</strong>
+</td>
+<td style="background-color:#d1e7dd; border-right:1px solid black;">
+Hit (H)
+</td>
+<td style="background-color:#f8d7da;">
+False alarm (FA)
+</td>
+</tr>
+<tr>
+<td style="border-right:1px solid black;">
+<strong>No</strong>
+</td>
+<td style="background-color:#f8d7da; border-right:1px solid black;">
+Miss (M)
+</td>
+<td style="background-color:#d1e7dd;">
+Correct rejection (CR)
+</td>
+</tr>
+</tbody></table>
+
 :::
 
 ::: {.column width="5%"}
@@ -612,9 +648,7 @@ where $\Phi^{-1}$ is the inverse of the cumulative distribution function\
 ## The Receiver Operating Characteristic (ROC) curve
 
 ::: {style="font-size: 85%;"}
-
 The ROC curve traces $(\mathrm{FA}(c), \mathrm{H}(c))$ as the criterion $c$ moves from liberal → conservative.
-
 
 ```{r, echo=FALSE}
 #| fig.height: 4.5
@@ -688,7 +722,6 @@ contourplot(dp ~ pFA + pH, data = xy,
 ## The zROC curve
 
 :::: {style="font-size: 85%;"}
-
 If we plot quantiles ($\Phi^-1\left[p(\text{FA})\right]$ and $\Phi^-1\left[p(\text{H})\right]$), also referred to as *Z-scores* ($z(\text{FA})$ and $z(\text{H})$), instead of probabilities the ROC curve becomes a straight line
 
 ```{r, echo=FALSE}
@@ -784,31 +817,27 @@ $$\left[ {\begin{array}{c}
 [Multilevel models pool information across participants, making estimates more robust, and can be particularly useful when many repetitions aren’t feasible]{style="color:red;"} (*e.g. knowledge questions, see Activity 4 in the worksheet*).
 :::
 
-
 ## Signal & noise beyond the (psychophysics) lab
 
  
 
-:::: {.columns}
+::::: columns
 ::: {.column width="50%"}
-
 ![](img/noise1.bmp){fig-align="center" width="50%"}
 
 <br>
 
 ![](img/signal1.bmp){fig-align="center" width="50%"}
-
 :::
-::: {.column width="50%"}
 
+::: {.column width="50%"}
 ![](img/false_poli.png){fig-align="center" width="80%"}
 
 <br>
 
 ![](img/true_poli.png){fig-align="center" width="80%"}
-
 :::
-::::
+:::::
 
 # Unequal-variance SDT
 
@@ -919,7 +948,7 @@ legend("topleft", legend = c("LLR(x)", "log β", "criteria"),
 
 ## ROC & zROC in equal vs unequal variance
 
-:::::: {style="font-size: 75%;"}
+::::: {style="font-size: 75%;"}
 -   Different variance in signal/noise distributions change the shape of the ROC curve
 -   The zROC curve remains a straight line, but the slope is $\ne1$ anymore
 -   Assuming noise Std. fixed at 1, the zROC slope is $\frac{1}{\sigma}$
@@ -969,14 +998,12 @@ par(op)
 ```
 :::
 
-:::: fragment
-
+::: fragment
 -   The slope of the zROC is a way to assess whether the equal-variance assumption is warranted.
 -   Measuring the slope is not simple! Need to measure $p(\text{H})$ and $p(\text{FA})$ at multiple criteria by manipulating priors/payoffs
 -   Rating scales as a workaround, but beware pitfalls (e.g. [Maniscalco & Lau, 2014](https://link.springer.com/chapter/10.1007/978-3-642-45190-4_3))
-
-::::
-::::::
+:::
+:::::
 
 # 
 
