@@ -1,0 +1,30 @@
+preferred-citation:
+  type: webpage
+  title: "Signal Detection Theory Workshop — CDS Summer School (2025)"
+  authors:
+    - family-names: Lisi
+      given-names: Matteo
+  year: 2025
+  month: 9
+  day: 8
+  url: https://mlisi.xyz/SDT-workshop/
+  
+  
+ cff-version: 1.2.0
+title: "Signal Detection Theory Workshop — CDS Summer School (2025)"
+authors:
+  - family-names: Lisi
+    given-names: Matteo
+date-released: 2025-09-08
+url: https://github.com/mattelisi/SDT-workshop
+preferred-citation:
+  type: webpage
+  title: "Signal Detection Theory Workshop — CDS Summer School (2025)"
+  authors:
+    - family-names: Lisi
+      given-names: Matteo
+  year: 2025
+  month: 9
+  day: 8
+  url: https://mlisi.xyz/SDT-workshop/
+
